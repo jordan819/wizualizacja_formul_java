@@ -1,8 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class Main {
 
@@ -187,7 +183,8 @@ public class Main {
                 evaluationStack.push(""+characterInQuestion);
             }
             else {
-                //Depending on the operator type, pop things off the stack into a mini output and push onto it the resulting expression succounded in parenthesis make a new column in the truth table
+                //Depending on the operator type, pop things off the stack into a mini output and push onto it the resulting
+                // expression succounded in parentheses make a new column in the truth table
                 String miniOutput;
                 if (characterInQuestion == '~') {
                     //This handles the only unary operator we have
@@ -297,7 +294,7 @@ public class Main {
                 i -= 2;
             }
             else if (characterInQuestion == '~') {
-                //Flip preceeding value, remove the not, subtract from i
+                //Flip preceeding value, remove the negation, subtract from i
                 if (postfixLogicalExpression.charAt(i-1) == 't') {
                     postfixLogicalExpression = replaceChar(postfixLogicalExpression, i-1, 'f');
                 }
@@ -328,9 +325,7 @@ class LogicalMatrix {
         if (!data.containsKey(columnHeader)) {
             orderAdded.add(columnHeader);
         }
-        if (data.get(columnHeader) == null) {
-            data.put(columnHeader, new ArrayList<>());
-        }
+        data.computeIfAbsent(columnHeader, k -> new ArrayList<>());
         data.get(columnHeader).add(value);
     }
 
@@ -342,8 +337,7 @@ class LogicalMatrix {
     public String toString() {
         int numRows = data.get(orderAdded.get(0)).size();
         String[] rows = new String[numRows+1];
-        for(int i = 0; i < rows.length; i++)
-            rows[i] = "| ";
+        Arrays.fill(rows, "| ");
 
         for (String key : orderAdded) {
             //Print the whole column for key
