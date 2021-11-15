@@ -31,12 +31,10 @@ public class Interface extends JFrame {
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
-			try
-			{
+			try {
 				Interface frame = new Interface();
 				frame.setVisible(true);
-			} catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -46,14 +44,13 @@ public class Interface extends JFrame {
 		return character == '&' || character == '~' || character == '>' || character == '|' || character == '#';
 	}
 
-	public static  Node construire (String  postfix) {
+	public static Node construire (String  postfix) {
 	     Stack<Node> pile = new Stack();
 	     Node tree;
 	     for (int i = 0; i<postfix.length(); i++) {
 	         if (!isConnector(postfix.charAt(i))) { //cas de proposition
 	             tree = new Node(postfix.charAt(i));
-	             pile.push(tree);
-	         } else {
+			 } else {
 
 	             if(postfix.charAt(i)!='~') { //cas de connecteur binaire
 	            	 tree = new Node(postfix.charAt(i));
@@ -63,9 +60,9 @@ public class Interface extends JFrame {
 	            	 tree = new Node(postfix.charAt(i));
 	            	 tree.right = pile.pop();
 	             }
-	             pile.push(tree);
-	         }
-	     }
+			 }
+			 pile.push(tree);
+		 }
 	     tree = pile.peek();
 	     pile.pop();
 	     return tree;
@@ -130,56 +127,14 @@ public class Interface extends JFrame {
 		formule.setBounds(10, 23, 192, 39);
 		contentPane.add(formule);
 		formule.setColumns(10);
-		JButton b1 = new JButton("~");
-		b1.setBackground(new Color(210, 180, 222 ));
-		b1.setFocusable(false);
-		b1.setFocusTraversalKeysEnabled(false);
-		b1.setFocusPainted(false);
-		b1.setBorderPainted(false);
-		b1.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		b1.setBounds(10, 82, 83, 39);
-		contentPane.add(b1);
-		b1.addActionListener(e -> formule.setText(formule.getText()+"~"));
-		JButton b2 = new JButton("&");
-		b2.setBackground(new Color(210, 180, 222 ));
-		b2.setBorderPainted(false);
-		b2.setFocusPainted(false);
-		b2.setFocusTraversalKeysEnabled(false);
-		b2.setFocusable(false);
-		b2.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		b2.setBounds(119, 82, 83, 39);
-		contentPane.add(b2);
-	    b2.addActionListener(e -> formule.setText(formule.getText()+"&"));
-		JButton b3 = new JButton(">");
-		b3.setBackground(new Color(210, 180, 222 ));
-		b3.setBorderPainted(false);
-		b3.setFocusPainted(false);
-		b3.setFocusTraversalKeysEnabled(false);
-		b3.setFocusable(false);
-		b3.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		b3.setBounds(119, 132, 83, 39);
-		contentPane.add(b3);
-	    b3.addActionListener(e -> formule.setText(formule.getText()+">"));
-		JButton b4 = new JButton("|");
-		b4.setBackground(new Color(210, 180, 222 ));
-		b4.setFocusPainted(false);
-		b4.setFocusTraversalKeysEnabled(false);
-		b4.setFocusable(false);
-		b4.setBorderPainted(false);
-		b4.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		b4.setBounds(10, 132, 83, 39);
-		contentPane.add(b4);
-	    b4.addActionListener(e -> formule.setText(formule.getText()+"|"));
-	    JButton b5 = new JButton("#");
-		b5.setBackground(new Color(210, 180, 222 ));
-	    b5.setFocusPainted(false);
-	    b5.setFocusTraversalKeysEnabled(false);
-	    b5.setFocusable(false);
-	    b5.setBorderPainted(false);
-		b5.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		b5.setBounds(63, 194, 83, 39);
-		contentPane.add(b5);
-        b5.addActionListener(e -> formule.setText(formule.getText()+"#"));
+
+
+		renderInputButton(contentPane, "~", 10, 82);
+		renderInputButton(contentPane, "&", 119, 82);
+		renderInputButton(contentPane, ">", 119, 132);
+		renderInputButton(contentPane, "|", 10, 132);
+		renderInputButton(contentPane, "#", 63, 194);
+
 		JButton Go = new JButton("POSTFIX");
 		Go.setBackground(new Color(210, 180, 222 ));
 		Go.setBorderPainted(false);
@@ -217,6 +172,7 @@ public class Interface extends JFrame {
 			   x = x+55;
 			}
 		});
+
 		JButton reset = new JButton("RESET");
 		reset.setBackground(new Color(210, 180, 222));
 		reset.setBorderPainted(false);
@@ -226,6 +182,11 @@ public class Interface extends JFrame {
 		reset.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		reset.setBounds(48, 445, 117, 39);
 		contentPane.add(reset);
+		reset.addActionListener(e -> {
+			formule.setText(formule.getText());
+			panel.removeAll();
+		});
+
 		btnBitree = new JButton("BI-TREE");
 		btnBitree.setBackground(new Color(210, 180, 222 ));
 		btnBitree.setFocusPainted(false);
@@ -235,6 +196,18 @@ public class Interface extends JFrame {
 		btnBitree.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		btnBitree.setBounds(48, 318, 117, 39);
 		contentPane.add(btnBitree);
+		btnBitree.addActionListener(e -> {
+			panel.removeAll();
+			String ex = formule.getText();
+			String result;
+			result = Postfix.infixToPostfix(ex);
+			System.out.println(result);
+			Node Tree= construire(result);
+			affichage(Tree);
+			System.out.println("\n");
+			drawNodes(Tree,x,y);
+		});
+
 		eva.setVisible(false);
 		JButton evaluate = new JButton("EVAL EXP");
 		evaluate.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -247,7 +220,6 @@ public class Interface extends JFrame {
 		contentPane.add(evaluate);
 		evaluate.addActionListener(e -> {
 			panel.removeAll();
-
 			int  x =  10 , y = 10 ;
 			String input = formule.getText();
 			String extract = input.replaceAll("[^a-zA-Z]+", "");
@@ -287,12 +259,15 @@ public class Interface extends JFrame {
 
 			StringBuilder sb = new StringBuilder();
 			Set<Character> linkedHashSet = new LinkedHashSet<>();
+
 			for (int i1 = 0; i1 < extract.length(); i1++){
 				linkedHashSet.add(extract.charAt(i1));
 			}
+
 			for (Character c1 : linkedHashSet){
 				sb.append(c1);
 			}
+
 			for (int j = 0; j <sb.length(); j++) {
 				System.out.println("donner la valuer de "+sb.charAt(j)+": ");
 				Scanner sc = new Scanner(System.in);
@@ -305,25 +280,25 @@ public class Interface extends JFrame {
 				input = z;
 				System.out.println(input);
 			}
+
 			Constant T = new Constant("T = 1");
 			Constant F = new Constant("F = 0");
 			Expression e1 = new Expression (input, T, F);
 			System.out.println(e1.getExpressionString() + " = " + e1.calculate());
 		});
-		btnBitree.addActionListener(e -> {
-			  panel.removeAll();
-			  String ex = formule.getText();
-			  String result;
-			  result = Postfix.infixToPostfix(ex);
-			  System.out.println(result);
-			  Node Tree= construire(result);
-			  affichage(Tree);
-			  System.out.println("\n");
-			  drawNodes(Tree,x,y);
-		});
-		reset.addActionListener(e -> {
-			formule.setText(formule.getText());
-			panel.removeAll();
-		});
 	}
+
+	private void renderInputButton(JPanel contentPane, String text, int x, int y) {
+		JButton button = new JButton(text);
+		button.setBackground(new Color(210, 180, 222 ));
+		button.setFocusable(false);
+		button.setFocusTraversalKeysEnabled(false);
+		button.setFocusPainted(false);
+		button.setBorderPainted(false);
+		button.setFont(new Font("Tahoma", Font.PLAIN, 23));
+		button.setBounds(x, y, 83, 39);
+		contentPane.add(button);
+		button.addActionListener(e -> formule.setText(formule.getText() + text));
+	}
+
 }
