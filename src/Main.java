@@ -14,45 +14,50 @@ public class Main {
         do {
             try {
                 System.out.println("""
-                        1 - Convert Infix Expression to Postfix Expression
-                        2 - Evaluate a Postfix Expression
-                        3 - Create a Truth Table for a Postfix Expression
-                        4 - Help
-                        5 - Exit""");
+                        1 - Konwersja postaci infiksowej na postfiksową
+                        2 - Obliczenie wartości wyrażenia postfiksowego
+                        3 - Generowanie macierzy logicznej wyrażenia postfiksowego
+                        4 - Pomoc
+                        5 - Wyjście""");
                 input = scan.nextInt();
-                if (input == 1) {
-                    System.out.println("Enter an infix expression:");
-                    scan.nextLine();
-                    System.out.println(infixToPostfix(scan.nextLine()));
-                }
-                else if (input == 2) {
-                    System.out.println("Enter a postfix expression:");
-                    scan.nextLine();
-                    String postfixExpression = scan.nextLine();
-                    HashMap<Character, Boolean> variableValues = new HashMap<>();
-                    System.out.println("Enter values for the required variables in the format \"[Variable Character] = [T/F]\", and \"done\" to stop:");
-                    String varIn;
-                    do {
-                        varIn = scan.nextLine();
-                        if (!varIn.equals("done")) {
-                            Character variableName = varIn.charAt(0);
-                            Boolean variableValue = (Character.toLowerCase(varIn.charAt(varIn.length() - 1)) == 't');
-                            variableValues.put(variableName, variableValue);
-                        }
-                    } while (!varIn.equals("done"));
-                    System.out.println("The expression evaluated to " + evaluatePostfixLogicalExpression(variableValues, postfixExpression) + ".");
-                }
-                else if (input == 3) {
-                    System.out.println("Enter a postfix expression:");
-                    scan.nextLine();
-                    System.out.println(postFixToTruthTable(scan.nextLine()));
-                }
-                else if (input != 5) {
-                    printHelp();
+
+                switch (input) {
+                    case 1 -> {
+                        System.out.println("Wprowadź wyrażenie w postaci infiksowej: ");
+                        scan.nextLine();
+                        System.out.println(infixToPostfix(scan.nextLine()));
+                    }
+                    case 2 -> {
+                        System.out.println("Wprowadź wyrażenie w postaci postfixowej: ");
+                        scan.nextLine();
+                        String postfixExpression = scan.nextLine();
+                        HashMap<Character, Boolean> variableValues = new HashMap<>();
+                        System.out.println("Podaj wartości zmiennych  \"[zmienna] = [T/F]\" i wprowadź \"done\" aby zakończyć:");
+                        String varIn;
+
+                        // read logical values of variables from user
+                        do {
+                            varIn = scan.nextLine();
+                            if (!varIn.equals("done")) {
+                                Character variableName = varIn.charAt(0);
+                                Boolean variableValue = (Character.toLowerCase(varIn.charAt(varIn.length() - 1)) == 't');
+                                variableValues.put(variableName, variableValue);
+                            }
+                        } while (!varIn.equals("done"));
+
+                        System.out.println("wartość wyrażenia to " + evaluatePostfixLogicalExpression(variableValues, postfixExpression) + ".");
+                    }
+                    case 3 -> {
+                        System.out.println("Wprowadź wyrażenie w postaci postfixowej: ");
+                        scan.nextLine();
+                        System.out.println(postfixToTruthTable(scan.nextLine()));
+                    }
+                    case 5 -> System.out.println("Thank you for using our program :) Goodbye!");
+                    default -> printHelp();
                 }
             }
             catch (Exception exception) {
-                System.out.println("Error: " + exception.getMessage());
+                System.err.println("Error: " + exception.getMessage());
             }
         } while(input != 5);
     }
@@ -62,44 +67,16 @@ public class Main {
      */
     public static void printHelp() {
         System.out.println("""
-                Help:
-                To use this software, enter the appropriate command
-                and then enter the input, if any is asked for, for\s
-                that command. Below is a listing of the commands and
-                a description of what they do.
-
-                1 - This command will prompt for an infix expression
-                    when selected, and output the postfix version of
-                    it. The algorithm reads character by character, so
-                    use single letters for variables and the logical
-                    operator characters specified at the bottom of this
-                    help document for logical operators.
-                2 - This command will prompt for a postfix logical
-                    expression and then for values for each unique
-                    variable in the given postfix expression.
-                3 - This command is the same as command 2, but it will,\s
-                    instead of prompting for values for variables,\s
-                    construct a full truth table with all possibilities
-                    for the given expression.
-                4 - This, along with any invalid main menu command, will
-                    display this help document.
-                5 - This command will terminate the program.
-
-                Below are the valid logical operators for use with this\s
-                program. Variables can be any lowercase or capital letters.
-
-                '~' - Not Unary Operator
-                '*' - And Operator
-                '+' - Or Operator
-                '>' - Implication Operator
-
-                This program was written by Philip Rodriguez for funsies.\s
-                Hope you like it. It comes with absolutely no warranty.
+                Dostępne symbole logiczne:
+                '~' - Negacja
+                '|' - Koniunkcja
+                '&' - Alternatywa
+                '>' - Implikacja
                 """);
     }
 
     /*
-    This just denotes our operator precedence.
+    Denotes operator precedence.
      */
     public static HashMap<Character, Integer> operatorPrecedence = new HashMap<>();
     static{
@@ -113,18 +90,17 @@ public class Main {
     Takes in a string containing only a valid infix logical expression, and returns a string representing that same
     logical expression in postfix form.
      */
-    public static String infixToPostfix(String infixLogicalExpression) throws Exception {
+    public static String infixToPostfix(String infixExpression) throws Exception {
         Stack<Character> operandStack = new Stack<>();
-        StringBuilder output = new StringBuilder(infixLogicalExpression.length()+1);
-        for(int i = 0; i < infixLogicalExpression.length(); i++) {
-            //Make sure the character is valid
-            if (!((""+infixLogicalExpression.charAt(i)).matches(validCharactersRegex) || (""+infixLogicalExpression.charAt(i)).matches("[()]")))
-            {
-                throw new Exception("Invalid character in input string: '" + infixLogicalExpression.charAt(i) + "'");
-            }
+        StringBuilder output = new StringBuilder(infixExpression.length()+1);
+        for(int i = 0; i < infixExpression.length(); i++) {
 
-            if (!Character.isAlphabetic(infixLogicalExpression.charAt(i))) {
-                char characterInQuestion = infixLogicalExpression.charAt(i);
+            //Make sure the character is valid
+            if (!((""+infixExpression.charAt(i)).matches(validCharactersRegex) || (""+infixExpression.charAt(i)).matches("[()]")))
+                throw new Exception("Niedozwolony znak: '" + infixExpression.charAt(i) + "'");
+
+            if (!Character.isAlphabetic(infixExpression.charAt(i))) {
+                char characterInQuestion = infixExpression.charAt(i);
                 if (characterInQuestion == '(') {
                     //Then push on our new open parenthesis
                     operandStack.push(characterInQuestion);
@@ -148,7 +124,7 @@ public class Main {
                     operandStack.push(characterInQuestion);
                 }
             } else {
-                output.append(infixLogicalExpression.charAt(i));
+                output.append(infixExpression.charAt(i));
             }
         }
 
@@ -175,11 +151,11 @@ public class Main {
     }
 
     /*
-    Takes in a postfix logical expression and returns a completed truth table for that logical expression.
+    Takes in a postfix logical expression and returns a completed truth table for it.
      */
-    public static TruthTable postFixToTruthTable(String postfixLogicalExpression) throws Exception {
+    public static LogicalMatrix postfixToTruthTable(String postfixLogicalExpression) throws Exception {
         //This is what we will be returning
-        TruthTable truthTable = new TruthTable();
+        LogicalMatrix logicalMatrix = new LogicalMatrix();
 
         //First detect all variables
         ArrayList<Character> uniqueVariables = getAllUniqueVariables(postfixLogicalExpression);
@@ -192,7 +168,7 @@ public class Main {
             boolean putVal = false;
             for(int j = 0; j < (numRowsPerColumn/numBeforeSwitch); j++) {
                 for(int k = 0; k < numBeforeSwitch; k++) {
-                    truthTable.addItemToColumn("" + uniqueVariables.get(i), putVal);
+                    logicalMatrix.addItemToColumn("" + uniqueVariables.get(i), putVal);
                 }
                 putVal = !putVal;
             }
@@ -204,7 +180,7 @@ public class Main {
             char characterInQuestion = postfixLogicalExpression.charAt(i);
             //Make sure the character is valid
             if (!("" + characterInQuestion).matches(validCharactersRegex)) {
-                throw new Exception("Invalid character in input string: '" + characterInQuestion + "'");
+                throw new Exception("Niedowzolony znak: '" + characterInQuestion + "'");
             }
             if (Character.isAlphabetic(characterInQuestion)) {
                 //Push it onto the stack
@@ -225,21 +201,21 @@ public class Main {
                 evaluationStack.push(miniOutput);
 
                 //Now, minioutput holds the column heading we need! So,
-                //how will we populate it's values?
+                //how will we populate its values?
                 int numRows = (int)Math.pow(2, uniqueVariables.size());
                 for(int j = 0; j < numRows; j++) {
                     //Get variable values for this row
                     HashMap<Character, Boolean> variableValues = new HashMap<>();
                     for (Character uniqueVariable : uniqueVariables) {
-                        variableValues.put(uniqueVariable, truthTable.getColumnValue("" + uniqueVariable, j));
+                        variableValues.put(uniqueVariable, logicalMatrix.getColumnValue("" + uniqueVariable, j));
                     }
 
                     //Add the correct result
-                    truthTable.addItemToColumn(miniOutput, evaluatePostfixLogicalExpression(variableValues, infixToPostfix(miniOutput)));
+                    logicalMatrix.addItemToColumn(miniOutput, evaluatePostfixLogicalExpression(variableValues, infixToPostfix(miniOutput)));
                 }
             }
         }
-        return truthTable;
+        return logicalMatrix;
     }
     /*
     Takes in a string, an index, and a character. Returns a new string that is the same as the passed in string except
@@ -248,6 +224,7 @@ public class Main {
     public static String replaceChar(String oldString, int index, char newChar) {
         return oldString.substring(0, index) + newChar + oldString.substring(index+1);
     }
+
     /*
     Take in a string and the index of the character to remove in the given string. Returns a new string that is the same
     as the passed in string but missing that character that was at index in the old string.
@@ -255,13 +232,15 @@ public class Main {
     public static String removeChar(String oldString, int index) {
         return oldString.substring(0, index) + oldString.substring(index+1);
     }
+
     public static boolean evaluatePostfixLogicalExpression(HashMap<Character, Boolean> variableValues, String postfixLogicalExpression) throws Exception {
         //First detect all variables
         ArrayList<Character> uniqueVariables = getAllUniqueVariables(postfixLogicalExpression);
 
         //Replace all of them with their truth values (lowercase 't' or 'f') values to make solving easier
         for (Character uniqueVariable : uniqueVariables) {
-            postfixLogicalExpression = postfixLogicalExpression.replace(uniqueVariable + "", (variableValues.get(uniqueVariable) + "").charAt(0) + "");
+            postfixLogicalExpression = postfixLogicalExpression.replace(uniqueVariable + "",
+                                                                (variableValues.get(uniqueVariable) + "").charAt(0) + "");
         }
 
         //Read from left to right the postfixLogicalExpression, evaluating as we scan!
@@ -269,7 +248,7 @@ public class Main {
             char characterInQuestion = postfixLogicalExpression.charAt(i);
             //Make sure the character is valid
             if (!("" + characterInQuestion).matches(validCharactersRegex)){
-                throw new Exception("Invalid character in input string: '" + characterInQuestion + "'");
+                throw new Exception("Niedozwolony znak: '" + characterInQuestion + "'");
             }
             //Now just match patterns
             if (characterInQuestion == '|') {
@@ -335,12 +314,12 @@ public class Main {
     }
 }
 
-class TruthTable {
+class LogicalMatrix {
 
     private final HashMap<String, ArrayList<Boolean>> data;
     private final ArrayList<String> orderAdded;
 
-    public TruthTable() {
+    public LogicalMatrix() {
         data = new HashMap<>();
         orderAdded = new ArrayList<>();
     }

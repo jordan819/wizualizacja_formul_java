@@ -251,7 +251,7 @@ public class Interface extends JFrame {
 			panel.add(textArea);
 			try {
 				textArea.setFont(new Font("Tahoma", Font.BOLD, 22));
-				textArea.setText(textArea.getText()+Main.postFixToTruthTable(Postfix.infixToPostfix(input))+"\n\n");
+				textArea.setText(textArea.getText()+Main.postfixToTruthTable(Postfix.infixToPostfix(input))+"\n\n");
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
